@@ -11,7 +11,13 @@ custom dashboards without touching the web UI.
 ## Install
 
 ```sh
-pip install isms
+pip install isms-sdk
+```
+
+The distribution is `isms-sdk`; you import it as `isms`:
+
+```python
+from isms import IsmsClient
 ```
 
 Requires Python 3.10 or later.
