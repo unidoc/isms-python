@@ -168,6 +168,32 @@ def test_document_body_by_id(client):
     assert client.documents.body("iso27001-4-1")["body"] == "# Context"
 
 
+def test_references_list_requires_both_args(client):
+    # The server 400s without both type+id, so the client must require them —
+    # a bare list() should fail fast with TypeError, not round-trip.
+    with pytest.raises(TypeError):
+        client.references.list()
+
+
+def test_resolve_base_url_only_matches_last_segment():
+    from isms.client import _resolve_base_url
+
+    assert _resolve_base_url("https://demo.isms.sh") == "https://demo.isms.sh/api"
+    assert _resolve_base_url("https://demo.isms.sh/") == "https://demo.isms.sh/api"
+    assert _resolve_base_url("https://demo.isms.sh/api") == "https://demo.isms.sh/api"
+    assert _resolve_base_url("https://demo.isms.sh/api/") == "https://demo.isms.sh/api"
+    # a path that merely contains /api/ is not the mount point
+    assert _resolve_base_url("https://demo.isms.sh/api/docs") == "https://demo.isms.sh/api/docs/api"
+
+
+@responses.activate
+def test_references_list_sends_both_params(client):
+    responses.get(f"{API}/v1/references", json={"data": []})
+    client.references.list(entity_type="risk", entity_id="RISK-1")
+    q = responses.calls[0].request.url
+    assert "type=risk" in q and "id=RISK-1" in q
+
+
 @responses.activate
 def test_organization_uuid_header_sent():
     # Org selection on a bare domain goes through X-Organization-UUID.

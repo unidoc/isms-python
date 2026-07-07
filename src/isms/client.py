@@ -43,7 +43,9 @@ _USER_AGENT = f"isms-python/{__version__}"
 
 def _resolve_base_url(url: str) -> str:
     url = url.rstrip("/")
-    if url.endswith("/api") or "/api/" in url + "/":
+    # Only treat the URL as already-mounted if its LAST segment is "api" — a raw
+    # substring check would wrongly match a proxy path like /api/docs.
+    if url.rsplit("/", 1)[-1] == "api":
         return url
     return url + "/api"
 
@@ -288,13 +290,13 @@ class ReferenceResource(_Resource):
     other registered entities to each other after they have been created.
     """
 
-    def list(self, *, entity_type: str | None = None, entity_id: str | None = None) -> list[dict]:
-        params: dict[str, Any] = {}
-        if entity_type:
-            params["type"] = entity_type
-        if entity_id:
-            params["id"] = entity_id
-        return _as_list(self._http.get("/v1/references", params=params or None))
+    def list(self, entity_type: str, entity_id: str) -> list[dict]:
+        # The server requires both query params (handleListReferences returns 400
+        # if either is missing), so both are required here — fail fast rather than
+        # round-trip to discover the 400.
+        return _as_list(
+            self._http.get("/v1/references", params={"type": entity_type, "id": entity_id})
+        )
 
     def create(
         self,
