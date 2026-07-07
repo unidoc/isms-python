@@ -1,0 +1,50 @@
+# CI — lint + unit tests for the Python client.
+#
+# Security model (public repo, fork PRs welcome):
+#   - `pull_request` trigger only — NEVER `pull_request_target`. Fork PRs run in
+#     an isolated ephemeral VM with a read-only GITHUB_TOKEN and no secrets.
+#   - This workflow uses no secrets; there is nothing to exfiltrate.
+#   - `permissions: contents: read` pins the token to read-only even on push.
+
+name: tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install --quiet -e ".[dev]"
+      - name: ruff
+        run: ruff check src tests
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install --quiet -e ".[dev]"
+      - name: pytest
+        run: pytest -q
