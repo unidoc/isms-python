@@ -1,0 +1,37 @@
+# Publish to PyPI on a version tag, via PyPI Trusted Publishing (OIDC) — no API
+# token stored anywhere. The published version is whatever pyproject.toml says;
+# the tag (v0.1.0, ...) is just the trigger. Bump pyproject.toml's version and the
+# _version.py to match before tagging.
+#
+# One-time PyPI setup (Trusted Publisher / "pending publisher" for a new project):
+#   PyPI Project Name: isms
+#   Owner:             unidoc
+#   Repository name:   isms-python
+#   Workflow name:     release.yml
+#   Environment name:  pypi
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # required for PyPI Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --quiet build
+          python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
