@@ -4,7 +4,7 @@
 # _version.py to match before tagging.
 #
 # One-time PyPI setup (Trusted Publisher / "pending publisher" for a new project):
-#   PyPI Project Name: isms
+#   PyPI Project Name: isms-sdk
 #   Owner:             unidoc
 #   Repository name:   isms-python
 #   Workflow name:     release.yml
