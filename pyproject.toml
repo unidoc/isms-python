@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "isms"
+version = "0.1.0"
+description = "Official Python client for the ISMS platform (isms.sh)"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [
+    { name = "ISMS", email = "hello@isms.sh" },
+]
+keywords = ["isms", "iso-27001", "nis2", "information-security", "compliance", "sdk"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+]
+dependencies = [
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "responses>=0.25",
+    "ruff>=0.5",
+]
+
+[project.urls]
+Homepage = "https://isms.sh"
+Documentation = "https://isms.sh/docs"
+Repository = "https://github.com/unidoc/isms-python"
+Issues = "https://github.com/unidoc/isms-python/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/isms"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/isms",
+    "tests",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -23,7 +23,9 @@ Point the client at your ISMS deployment and give it an API token:
 ```sh
 export ISMS_API_URL=https://your-org.isms.sh
 export ISMS_API_TOKEN=<api-token>
-export ISMS_ORGANIZATION=<org-slug>   # only if your token spans multiple orgs
+# Only needed for a multi-org token on a bare domain; a subdomain URL
+# (https://your-org.isms.sh) already selects the org server-side.
+export ISMS_ORGANIZATION_UUID=<org-uuid>
 ```
 
 Create the token from an admin session with `isms server api-key create`
