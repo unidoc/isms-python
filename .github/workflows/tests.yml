@@ -31,7 +31,9 @@ jobs:
           python-version: "3.13"
       - run: pip install --quiet -e ".[dev]"
       - name: ruff
-        run: ruff check src tests
+        # examples/ is linted too so a published example can't silently rot
+        # (undefined names, bad imports) when the SDK changes.
+        run: ruff check src tests examples
 
   test:
     runs-on: ubuntu-latest
